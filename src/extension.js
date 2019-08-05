@@ -1,21 +1,17 @@
 // Drive menu extension
-const Clutter = imports.gi.Clutter;
-const Gio = imports.gi.Gio;
-const St = imports.gi.St;
-const Shell = imports.gi.Shell;
+'use strict';
+/* exported init enable disable */
+const { Gio, GObject, Shell, St } = imports.gi;
 
-const Gettext = imports.gettext.domain('gnome-shell-extensions');
+const Gettext = imports.gettext.domain('com-subgraph-shell-drive-menu');
 const _ = Gettext.gettext;
 
 const Main = imports.ui.main;
-const Panel = imports.ui.panel;
 const PanelMenu = imports.ui.panelMenu;
 const PopupMenu = imports.ui.popupMenu;
 const ShellMountOperation = imports.ui.shellMountOperation;
 
 const ExtensionUtils = imports.misc.extensionUtils;
-const Me = ExtensionUtils.getCurrentExtension();
-const Convenience = Me.imports.convenience;
 
 class MountMenuItem extends PopupMenu.PopupBaseMenuItem {
     constructor(mount) {
@@ -27,8 +23,10 @@ class MountMenuItem extends PopupMenu.PopupBaseMenuItem {
 
         this.mount = mount;
 
-        let ejectIcon = new St.Icon({ icon_name: 'media-eject-symbolic',
-                                      style_class: 'popup-menu-icon ' });
+        let ejectIcon = new St.Icon({
+            icon_name: 'media-eject-symbolic',
+            style_class: 'popup-menu-icon'
+        });
         let ejectButton = new St.Button({ child: ejectIcon });
         ejectButton.connect('clicked', this._eject.bind(this));
         this.actor.add(ejectButton);
@@ -68,24 +66,24 @@ class MountMenuItem extends PopupMenu.PopupBaseMenuItem {
     }
 
     _eject() {
-        let mountOp = new ShellMountOperation.ShellMountOperation(this.mount);
+        let unmountArgs = [
+            Gio.MountUnmountFlags.NONE,
+            (new ShellMountOperation.ShellMountOperation(this.mount)).mountOp,
+            null // Gio.Cancellable
+        ];
 
         if (this.mount.can_eject())
-            this.mount.eject_with_operation(Gio.MountUnmountFlags.NONE,
-                                            mountOp.mountOp,
-                                            null, // Gio.Cancellable
+            this.mount.eject_with_operation(...unmountArgs,
                                             this._ejectFinish.bind(this));
         else
-            this.mount.unmount_with_operation(Gio.MountUnmountFlags.NONE,
-                                              mountOp.mountOp,
-                                              null, // Gio.Cancellable
+            this.mount.unmount_with_operation(...unmountArgs,
                                               this._unmountFinish.bind(this));
     }
 
     _unmountFinish(mount, result) {
         try {
             mount.unmount_with_operation_finish(result);
-        } catch(e) {
+        } catch (e) {
             this._reportFailure(e);
         }
     }
@@ -93,14 +91,14 @@ class MountMenuItem extends PopupMenu.PopupBaseMenuItem {
     _ejectFinish(mount, result) {
         try {
             mount.eject_with_operation_finish(result);
-        } catch(e) {
+        } catch (e) {
             this._reportFailure(e);
         }
     }
 
     _reportFailure(exception) {
         // TRANSLATORS: %s is the filesystem name
-        let msg = _("Ejecting drive “%s” failed:").format(this.mount.get_name());
+        let msg = _('Ejecting drive “%s” failed:').format(this.mount.get_name());
         Main.notifyError(msg, exception.message);
     }
 
@@ -111,19 +109,22 @@ class MountMenuItem extends PopupMenu.PopupBaseMenuItem {
 
         super.activate(event);
     }
-};
+}
 
+let DriveMenu = GObject.registerClass(
 class DriveMenu extends PanelMenu.Button {
-    constructor() {
-        super(0.0, _("Removable devices"));
+    _init() {
+        super._init(0.0, _('Removable devices'));
 
         let hbox = new St.BoxLayout({ style_class: 'panel-status-menu-box' });
-        let icon = new St.Icon({ icon_name: 'media-eject-symbolic',
-                                 style_class: 'system-status-icon' });
+        let icon = new St.Icon({
+            icon_name: 'media-eject-symbolic',
+            style_class: 'system-status-icon'
+        });
 
         hbox.add_child(icon);
         hbox.add_child(PopupMenu.arrowIcon(St.Side.BOTTOM));
-        this.actor.add_child(hbox);
+        this.add_child(hbox);
 
         this._monitor = Gio.VolumeMonitor.get();
         this._addedId = this._monitor.connect('mount-added', (monitor, mount) => {
@@ -135,7 +136,7 @@ class DriveMenu extends PanelMenu.Button {
             this._updateMenuVisibility();
         });
 
-        this._mounts = [ ];
+        this._mounts = [];
 
         this._monitor.get_mounts().forEach(this._addMount.bind(this));
 
@@ -144,9 +145,9 @@ class DriveMenu extends PanelMenu.Button {
 
     _updateMenuVisibility() {
         if (this._mounts.filter(i => i.actor.visible).length > 0)
-            this.actor.show();
+            this.show();
         else
-            this.actor.hide();
+            this.hide();
     }
 
     _addMount(mount) {
@@ -167,20 +168,20 @@ class DriveMenu extends PanelMenu.Button {
         log ('Removing a mount that was never added to the menu');
     }
 
-    destroy() {
-        if (this._connectedId) {
-            this._monitor.disconnect(this._connectedId);
-            this._monitor.disconnect(this._disconnectedId);
-            this._connectedId = 0;
-            this._disconnectedId = 0;
+    _onDestroy() {
+        if (this._addedId) {
+            this._monitor.disconnect(this._addedId);
+            this._monitor.disconnect(this._removedId);
+            this._addedId = 0;
+            this._removedId = 0;
         }
 
-        super.destroy();
+        super._onDestroy();
     }
-};
+});
 
 function init() {
-    Convenience.initTranslations();
+    ExtensionUtils.initTranslations();
 }
 
 let _indicator;
