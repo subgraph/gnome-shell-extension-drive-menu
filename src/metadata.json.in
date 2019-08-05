@@ -1,0 +1,11 @@
+{
+ "extension-id": "drive-menu@subgraph.com",
+ "uuid": "@uuid@",
+ "settings-schema": "com.subgraph.drive-menu",
+ "gettext-domain": "@gettext_domain@",
+ "name": "Removable Drive Menu",
+ "description": "A status menu for accessing and unmounting removable devices.",
+ "shell-version": [ "3.32" ],
+ "url": "https://github.com/subgraph/gnome-shell-extension-drive-menu"
+ "version": "@VCS_TAG@"
+}
