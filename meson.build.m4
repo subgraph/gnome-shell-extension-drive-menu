@@ -70,7 +70,7 @@ endif
 home     = gse_run_command_obj.stdout().strip()
 
 gse_uuid		 = meson.project_name() + '@$2'
-gse_target_dir		 = home + '/.local/share/gnome-shell/extensions/' + gse_uuid
+gse_target_dir		 = '/usr/share/gnome-shell/extensions/' + gse_uuid
 gse_target_dir_schemas   = join_paths(gse_target_dir, 'schemas')
 gse_target_locale_dir    = join_paths(gse_target_dir, 'locale')
 gse_target_dir_dbus_intf = join_paths(gse_target_dir, 'dbus-interfaces')
