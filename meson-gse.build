@@ -1,3 +1,4 @@
 gse_project({drive-menu}, {subgraph.com}, {01}, {
 gse_target_dir = '/usr/share/gnome-shell/extensions/drive-menu@subgraph.com'
+gse_libs += gse_lib_convenience
 })
