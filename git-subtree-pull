@@ -17,4 +17,4 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 set -eu
-git subtree pull -P meson-gse -m "Pull from meson-gse." git@github.com:F-i-f/meson-gse.git master
+git subtree pull -P meson-gse -m "Pull from meson-gse." git@github.com:xSmurf/meson-gse.git master

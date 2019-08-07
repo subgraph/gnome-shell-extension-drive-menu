@@ -17,4 +17,4 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 set -eu
-git subtree push -P meson-gse -m "Push to meson-gse." git@github.com:F-i-f/meson-gse.git master
+git subtree push -P meson-gse -m "Push to meson-gse." git@github.com:xSmurf/meson-gse.git master
