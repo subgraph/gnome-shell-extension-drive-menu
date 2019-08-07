@@ -27,6 +27,9 @@ project('$1',
 	meson_version: '>= 0.44.0',
 	license: 'GPL3' )
 
+prefix = get_option('prefix')
+datadir = get_option('datadir')
+
 gnome = import('gnome')
 i18n  = import('i18n')
 
@@ -69,8 +72,11 @@ if gse_run_command_obj.returncode() != 0
 endif
 home     = gse_run_command_obj.stdout().strip()
 
+#option('installpath', type : 'string', value : '/usr/share/gnome-shell/extensions', description : 'The path where to install the extension')
+
+#message('PREFIX not found, exit=@'.format(prefix))
 gse_uuid		 = meson.project_name() + '@$2'
-gse_target_dir		 = '/usr/share/gnome-shell/extensions/' + gse_uuid
+gse_target_dir		 = datadir / 'gnome-shell/extensions' / gse_uuid
 gse_target_dir_schemas   = join_paths(gse_target_dir, 'schemas')
 gse_target_locale_dir    = join_paths(gse_target_dir, 'locale')
 gse_target_dir_dbus_intf = join_paths(gse_target_dir, 'dbus-interfaces')
