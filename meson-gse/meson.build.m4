@@ -135,7 +135,7 @@ install_data(gse_dbus_interfaces,
 custom_target('gse-extension.zip',
 	      build_by_default: false,
 	      install: false,
-	      command: [files(join_paths(meson_extra_scripts, 'make-extension')), gse_target_dir, '@OUTDIR@', '@OUTPUT@'],
+	      command: [files(join_paths(meson_extra_scripts, 'make-extension')), prefix / gse_target_dir, '@OUTDIR@', '@OUTPUT@'],
 	      output:  'extension.zip')
 
 gse_run_command_obj = run_command('test', '-d', 'po')

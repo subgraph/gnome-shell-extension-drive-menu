@@ -16,4 +16,4 @@
 
 i18n.gettext(gse_gettext_domain, preset: 'glib', install: false)
 meson.add_install_script(join_paths(meson.source_root(), meson_extra_scripts, 'install-po'),
-			 gse_gettext_domain, gse_target_locale_dir)
+			 gse_gettext_domain, prefix / gse_target_locale_dir)
