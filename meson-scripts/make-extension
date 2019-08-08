@@ -46,4 +46,4 @@ trap clean INT TERM HUP QUIT EXIT
 
 tmpdir="$(mktemp -d "$(pwd)/make-extension-XXXXXXX.tmp")"
 DESTDIR="$tmpdir" ninja install
-cd "$tmpdir$install_dir" && zip -r "$output_dir/$output_file" *
+cd "$tmpdir/$install_dir" && zip -r "$output_dir/$output_file" *
